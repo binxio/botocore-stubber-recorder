@@ -1,0 +1,37 @@
+"""
+Generated base class for the {{ generator.name }} unit test. The setup will provide stubbed
+responses for all recorded requests.
+
+** generated code - do not edit **
+"""
+import unittest
+import botocore.session
+from botocore.stub import Stubber
+{% for request in recorder.requests %}
+from . import call_{{ "%05d"|format(loop.index) }}_{{ request.operation }}
+{% endfor %}
+
+class {{ generator.name_in_camel_case }}UnitTestBase(unittest.TestCase):
+
+    def setUp(self) -> None:
+        """
+        add stubs for all AWS API calls
+        """
+        self.session = botocore.session.get_session()
+        self.clients = {service: self.session.create_client(service) for service in [{%- for service in recorder.invoked_service_names -%}"{{  service  }}"{{  ", " if not loop.last else "" }}{%- endfor -%}]}
+        self.stubs = {service: Stubber(client) for service, client in self.clients.items()}
+
+        {% for request in recorder.requests %}
+        self.stubs["{{request.service_name}}"].add_response("{{ request.operation }}", call_{{ "%05d"|format(loop.index) }}_{{ request.operation }}.response, call_{{ "%05d"|format(loop.index) }}_{{ request.operation }}.request)
+        {% endfor %}
+        for _, stub in self.stubs.items():
+            stub.activate()
+        self.session.client = lambda x: self.clients[x]
+
+    def tearDown(self) -> None:
+        """
+        check all api calls were executed
+        """
+        for service, stub in self.stubs.items():
+            stub.assert_no_pending_responses()
+            stub.deactivate()

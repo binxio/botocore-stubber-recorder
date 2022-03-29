@@ -1,0 +1,20 @@
+"""
+{{ generator.name }} unit test.
+"""
+import unittest
+from .base import {{ generator.name_in_camel_case }}UnitTestBase
+
+
+class {{ generator.name_in_camel_case }}UnitTest({{ generator.name_in_camel_case }}UnitTestBase):
+
+    def test_{{ generator.name }}(self) -> None:
+        """
+        {{generator.name }} test. Stubbed clients will be returned for:{%
+          for service in recorder.invoked_service_names %}
+            - self.session.client("{{ service }}"){% endfor %}.
+        """
+        self.fail("not yet implemented")
+
+
+if __name__ == '__main__':
+    unittest.main()

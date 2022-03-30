@@ -39,11 +39,12 @@ class MyTestCase(unittest.TestCase):
         client.describe_regions()
 
         client = session.client("ssm")
-        client.describe_parameters()
+        client.describe_parameters(Filters=[{"Key": "Name", "Values": ["ALPHA_"]}], MaxResults=50)
 
         client = session.client("rds")
         client.describe_db_clusters()
 
+        self.assertEqual(3, len(recorder.requests))
         self.assertSetEqual({"ec2",  "rds", "ssm"}, recorder.invoked_service_names)
 
         generator = UnitTestGenerator("multiple_calls", "generated")

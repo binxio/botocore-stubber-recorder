@@ -12,7 +12,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='botocore-stubber-recorder',
-    version="0.2.8",
+    version="0.2.0",
     url='https://github.com/binxio/botocore-stubber-recorder',
     license='BSD',
     author='Mark van Holsteijn',
@@ -21,6 +21,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     package_dir={'': 'src'},
+    package_data={'': ['templates/*']},
     packages=find_packages(where='src'),
     include_package_data=True,
     zip_safe=False,

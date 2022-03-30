@@ -1,6 +1,7 @@
 __pycache__
 /.idea/
 /build/
+/dist/
 /tests/generated/
 *egg-info
 *.pyc

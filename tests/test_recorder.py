@@ -2,11 +2,14 @@ import boto3
 import sys
 import unittest
 from tempfile import TemporaryDirectory
-from botocore_stubber_recorder import BotoRecorder, UnitTestGenerator, BotoRecorderUnitTestGenerator
+from botocore_stubber_recorder import (
+    BotoRecorder,
+    UnitTestGenerator,
+    BotoRecorderUnitTestGenerator,
+)
 
 
 class MyTestCase(unittest.TestCase):
-
     def setUp(self) -> None:
         self.directory = TemporaryDirectory()
 
@@ -23,7 +26,9 @@ class MyTestCase(unittest.TestCase):
 
         request = recorder.requests[0]
         self.assertEqual("DescribeRegions", request.model.name)
-        self.assertEqual(request.request, {'Action': 'DescribeRegions', 'Version': '2016-11-15'})
+        self.assertEqual(
+            request.request, {"Action": "DescribeRegions", "Version": "2016-11-15"}
+        )
         self.assertEqual(response, request.response)
 
         self.assertSetEqual({"ec2"}, recorder.invoked_service_names)
@@ -40,23 +45,27 @@ class MyTestCase(unittest.TestCase):
         client.describe_regions()
 
         client = session.client("ssm")
-        client.describe_parameters(Filters=[{"Key": "Name", "Values": ["ALPHA_"]}], MaxResults=50)
+        client.describe_parameters(
+            Filters=[{"Key": "Name", "Values": ["ALPHA_"]}], MaxResults=50
+        )
 
         client = session.client("rds")
         client.describe_db_clusters()
 
         self.assertEqual(3, len(recorder.requests))
-        self.assertSetEqual({"ec2",  "rds", "ssm"}, recorder.invoked_service_names)
+        self.assertSetEqual({"ec2", "rds", "ssm"}, recorder.invoked_service_names)
 
         generator = UnitTestGenerator("multiple_calls", "generated", "generated")
         generator.generate(recorder)
 
     def test_contextmanager(self):
         session = boto3.session.Session(profile_name="integration-test")
-        with BotoRecorderUnitTestGenerator("contextmanager", session, "generated", "generated") as generator:
+        with BotoRecorderUnitTestGenerator(
+            "contextmanager", session, "generated", "generated"
+        ) as generator:
             client = session.client("rds")
             client.describe_db_instances()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

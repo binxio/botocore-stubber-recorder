@@ -90,3 +90,33 @@ class UnitTestGenerator:
                 os.open(filename, os.O_WRONLY | os.O_CREAT, 0o600), "w"
             ) as file:
                 request.generate_add_response_function(file, anonimize)
+
+
+class BotoRecorderUnitTestGenerator:
+    """
+    a context manager which combines BotoRecorder and UnitTest generator, so you can write:
+
+    with BotoRecorderUnitTestGenerator("describe_regions", session) as generator:
+        response = session.client("ec2").describe_regions()
+
+    this will generate
+    """
+    def __init__(
+            self,
+            name: str,
+            session: botocore.session.Session,
+            directory: str = "./tests",
+            package: str = "",
+            anonimize=True,
+    ):
+        self.session = session
+        self.generator = UnitTestGenerator(name, directory, package)
+        self.recorder: BotoRecorder = None
+        self.anonimize = anonimize
+
+    def __enter__(self):
+        self.recorder = BotoRecorder(self.session)
+        return self
+
+    def __exit__(self, type, value, tb):
+        self.generator.generate(self.recorder, self.anonimize)

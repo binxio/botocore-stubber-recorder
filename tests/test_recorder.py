@@ -2,7 +2,7 @@ import boto3
 import sys
 import unittest
 from tempfile import TemporaryDirectory
-from botocore_stubber_recorder import BotoRecorder, UnitTestGenerator
+from botocore_stubber_recorder import BotoRecorder, UnitTestGenerator, BotoRecorderUnitTestGenerator
 
 
 class MyTestCase(unittest.TestCase):
@@ -50,6 +50,12 @@ class MyTestCase(unittest.TestCase):
 
         generator = UnitTestGenerator("multiple_calls", "generated", "generated")
         generator.generate(recorder)
+
+    def test_contextmanager(self):
+        session = boto3.session.Session(profile_name="integration-test")
+        with BotoRecorderUnitTestGenerator("contextmanager", session, "generated", "generated") as generator:
+            client = session.client("rds")
+            client.describe_db_instances()
 
 
 if __name__ == '__main__':

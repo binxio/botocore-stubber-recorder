@@ -1,7 +1,9 @@
 import os
 import re
+from contextlib import contextmanager
 import logging
 import botocore
+from typing import Optional
 from jinja2 import Template, Environment, PackageLoader, select_autoescape
 from botocore_stubber_recorder.recorder import BotoRecorder
 from botocore_stubber_recorder.request import BotoRequest
@@ -12,10 +14,17 @@ env = Environment(
 
 
 class UnitTestGenerator:
-    def __init__(self, name: str, directory: str):
+    def __init__(self, name: str, directory: str, package: str = None):
+        if not re.match(r"[a-z_]+", name):
+            raise ValueError(f'only snake case allowed for the name, not "{name}"')
+        if package and not re.match(r"[a-z_\.]+", package):
+            raise ValueError(
+                f'only snake case and dots allowed for the package, not "{package}"'
+            )
+
         self.directory = directory
         self.name = name
-        self.aws_account = "123456789012"
+        self.package = f"{package}." if package else ""
 
     @property
     def unittest_base_template(self) -> Template:
@@ -29,7 +38,23 @@ class UnitTestGenerator:
     def name_in_camel_case(self):
         return "".join(w.capitalize() or "_" for w in self.name.split("_"))
 
-    def generate(self, recorder: BotoRecorder):
+    def _remove(self, path: str, type: Optional[str] = None):
+        logging.info("removing generated %s %s", type, path)
+        os.remove(path) if type == "file" else os.rmdir(path)
+
+    def remove_all_call_directories(self, root: str):
+        for call_directory in map(lambda e: os.path.join(root, e), os.listdir(root)):
+            if re.match(r"^call_[0-9]{5,}_", os.path.basename(call_directory)):
+                for (child, directories, files) in os.walk(
+                    call_directory, topdown=False
+                ):
+                    for file in files:
+                        self._remove(os.path.join(child, file), "file")
+                    for directory in directories:
+                        self._remove(os.path.join(child, directory))
+                self._remove(call_directory)
+
+    def generate(self, recorder: BotoRecorder, anonimize: bool = False):
         test_directory = os.path.join(self.directory, self.name)
         os.makedirs(test_directory, exist_ok=True)
 
@@ -53,6 +78,7 @@ class UnitTestGenerator:
         else:
             logging.info("%s already exists, not overwritten", filename)
 
+        self.remove_all_call_directories(test_directory)
         for n, request in enumerate(recorder.requests):
             operation = botocore.xform_name(request.model.name)
             directory = os.path.join(test_directory, f"call_{n+1:05d}_{operation}")
@@ -63,16 +89,4 @@ class UnitTestGenerator:
             with os.fdopen(
                 os.open(filename, os.O_WRONLY | os.O_CREAT, 0o600), "w"
             ) as file:
-                request.generate_add_response_function(file)
-
-
-_arn_regex = re.compile(
-    r"arn:aws:(?P<service>[^:]*):(?P<region>[^:]*):(?P<account>[^:]*)"
-)
-
-
-def anonimize_aws_account(output: str) -> str:
-    return _arn_regex.sub(
-        lambda m: f'arn:aws:{m.group("service")}:{m.group("region")}:123456789012',
-        output,
-    )
+                request.generate_add_response_function(file, anonimize)

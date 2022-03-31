@@ -8,7 +8,7 @@ import unittest
 import botocore.session
 from botocore.stub import Stubber
 {% for request in recorder.requests %}
-from . import call_{{ "%05d"|format(loop.index) }}_{{ request.operation }}
+from {{ generator.package }}{{ generator.name }} import call_{{ "%05d"|format(loop.index) }}_{{ request.operation }}
 {% endfor %}
 
 class {{ generator.name_in_camel_case }}UnitTestBase(unittest.TestCase):

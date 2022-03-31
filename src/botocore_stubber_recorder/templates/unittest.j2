@@ -5,7 +5,7 @@ Implement the actual test in test_{{ generator.name }}
 """
 import logging
 import unittest
-from .base import {{ generator.name_in_camel_case }}UnitTestBase
+from {{ generator.package }}{{ generator.name }}.base import {{ generator.name_in_camel_case }}UnitTestBase
 
 
 class {{ generator.name_in_camel_case }}UnitTest({{ generator.name_in_camel_case }}UnitTestBase):
@@ -19,7 +19,7 @@ class {{ generator.name_in_camel_case }}UnitTest({{ generator.name_in_camel_case
         logging.warning("TODO: replace {{ generator.name_in_camel_case }}UnitTest.test_{{ generator.name }} with the actual test. This just tests the generated code.")
         {% for request in recorder.requests %}
         {%- set call_name = "call_{index:05d}_{operation}".format(index=loop.index, operation=request.operation) -%}
-        from . import {{ call_name }}
+        from {{ generator.package }}{{ generator.name }} import {{ call_name }}
         response = self.session.client("{{request.service_name}}").{{ request.operation }}(**{{  call_name }}.request)
         self.assertEqual({{ call_name }}.response, response)
 

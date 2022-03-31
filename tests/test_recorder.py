@@ -1,6 +1,6 @@
 import boto3
+import sys
 import unittest
-from uuid import uuid4
 from tempfile import TemporaryDirectory
 from botocore_stubber_recorder import BotoRecorder, UnitTestGenerator
 
@@ -28,10 +28,11 @@ class MyTestCase(unittest.TestCase):
 
         self.assertSetEqual({"ec2"}, recorder.invoked_service_names)
 
-        generator = UnitTestGenerator("describe_regions", "generated")
+        generator = UnitTestGenerator("describe_regions", "generated", "generated")
         generator.generate(recorder)
 
     def test_record_multiple_calls(self):
+
         session = boto3.session.Session(profile_name="integration-test")
         recorder = BotoRecorder(session)
 
@@ -47,7 +48,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(3, len(recorder.requests))
         self.assertSetEqual({"ec2",  "rds", "ssm"}, recorder.invoked_service_names)
 
-        generator = UnitTestGenerator("multiple_calls", "generated")
+        generator = UnitTestGenerator("multiple_calls", "generated", "generated")
         generator.generate(recorder)
 
 

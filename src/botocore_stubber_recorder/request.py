@@ -1,3 +1,4 @@
+import re
 import json
 from copy import deepcopy
 from io import TextIOBase
@@ -59,7 +60,9 @@ class BotoRequest:
         """
         return self.model.service_model.service_name
 
-    def generate_add_response_function(self, stream: TextIOBase):
+    def generate_add_response_function(
+        self, stream: TextIOBase, anonimize: bool = False
+    ):
         """
         returns python code for the function adding the `request` and `response` for the `operation`
         add_response to a passedin in stub.
@@ -67,13 +70,35 @@ class BotoRequest:
         """
         operation = botocore.xform_name(self.model.name)
         stream.truncate(0)
+        request = (
+            anonimize_aws_account(str(self.cleaned_request))
+            if anonimize
+            else str(self.cleaned_request)
+        )
+        response = (
+            anonimize_aws_account(str(self.response))
+            if anonimize
+            else str(self.response)
+        )
         stream.writelines(
             [
                 "import botocore\n",
                 "import datetime\n",
                 "from dateutil.tz import tzutc, tzlocal\n",
                 "\n\n",
-                f"request = {self.cleaned_request}\n",
-                f"response = {self.response}\n",
+                f"request = {request}\n",
+                f"response = {response}\n",
             ]
         )
+
+
+_arn_regex = re.compile(
+    r"arn:aws:(?P<service>[^:]*):(?P<region>[^:]*):(?P<account>[^:]*)"
+)
+
+
+def anonimize_aws_account(output: str) -> str:
+    return _arn_regex.sub(
+        lambda m: f'arn:aws:{m.group("service")}:{m.group("region")}:123456789012',
+        output,
+    )

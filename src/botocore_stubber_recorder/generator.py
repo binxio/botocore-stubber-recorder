@@ -7,6 +7,7 @@ from typing import Optional
 from jinja2 import Template, Environment, PackageLoader, select_autoescape
 from botocore_stubber_recorder.recorder import BotoRecorder
 from botocore_stubber_recorder.request import APICall
+from botocore_stubber_recorder.format import is_black_on_path, format_source_code
 
 env = Environment(
     loader=PackageLoader("botocore_stubber_recorder"), autoescape=select_autoescape()
@@ -19,6 +20,7 @@ class UnitTestGenerator:
     `name` is the name of the test, must be snake case. `package` is the
     python package name for the generated code. the code is generated in `directory`.
     """
+
     def __init__(self, name: str, directory: str, package: str = None):
         if not re.match(r"[a-z_]+", name):
             raise ValueError(f'only snake case allowed for the name, not "{name}"')
@@ -118,6 +120,9 @@ class UnitTestGenerator:
             ) as file:
                 request.generate_add_response_function(file, anonimize)
 
+        if is_black_on_path():
+            format_source_code(test_directory)
+
 
 class BotoRecorderUnitTestGenerator:
     """
@@ -128,13 +133,14 @@ class BotoRecorderUnitTestGenerator:
 
     this will generate
     """
+
     def __init__(
-            self,
-            name: str,
-            session: botocore.session.Session,
-            directory: str = "./tests",
-            package: str = "",
-            anonimize=True,
+        self,
+        name: str,
+        session: botocore.session.Session,
+        directory: str = "./tests",
+        package: str = "",
+        anonimize=True,
     ):
         self.session = session
         self.generator = UnitTestGenerator(name, directory, package)

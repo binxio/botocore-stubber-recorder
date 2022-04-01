@@ -13,6 +13,7 @@ class APICall:
     """
     represents an AWS API call.
     """
+
     def __init__(self, model: OperationModel, request: Union[dict, bytes]):
         self.uuid: str = str(uuid4())
         self._response: dict = {}

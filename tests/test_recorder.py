@@ -22,9 +22,9 @@ class MyTestCase(unittest.TestCase):
 
         client = session.client("ec2")
         response = client.describe_regions()
-        self.assertEqual(1, len(recorder.requests))
+        self.assertEqual(1, len(recorder.calls))
 
-        request = recorder.requests[0]
+        request = recorder.calls[0]
         self.assertEqual("DescribeRegions", request.model.name)
         self.assertEqual(
             request.request, {"Action": "DescribeRegions", "Version": "2016-11-15"}
@@ -52,7 +52,7 @@ class MyTestCase(unittest.TestCase):
         client = session.client("rds")
         client.describe_db_clusters()
 
-        self.assertEqual(3, len(recorder.requests))
+        self.assertEqual(3, len(recorder.calls))
         self.assertSetEqual({"ec2", "rds", "ssm"}, recorder.invoked_service_names)
 
         generator = UnitTestGenerator("multiple_calls", "generated", "generated")

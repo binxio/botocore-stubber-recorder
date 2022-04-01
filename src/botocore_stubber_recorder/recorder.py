@@ -8,6 +8,7 @@ class BotoRecorder:
     """
     records all AWS API calls
     """
+
     def __init__(self, session: botocore.session.Session):
         self.calls: [APICall] = []
         self.session = session

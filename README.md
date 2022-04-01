@@ -49,7 +49,8 @@ tests
 The `base.py` contains a base unittest class which initializes the stub with all the recorded
 calls. Note that the `base.py` and the call directories are overwritten on each generate request. 
 The `test_my_example.py` contains an example unittest implementation, which needs to be changed
-to contain the actual test. The generated test, just tests that the stub is operational.
+to contain the actual test. The generated test just tests that the generated stub: you
+have to replace the method `test_my_example` with a functional test.
 
 ## Run the generated test
 You can now run, the generated test:

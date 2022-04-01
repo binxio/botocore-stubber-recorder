@@ -51,8 +51,6 @@ calls. Note that the `base.py` and the call directories are overwritten on each 
 The `test_my_example.py` contains an example unittest implementation, which needs to be changed
 to contain the actual test. The generated test, just tests that the stub is operational.
 
-## formatting generated code
-The generated code is formatted using black, if black is on the path.
 ## Run the generated test
 You can now run, the generated test:
 ```shell
@@ -67,3 +65,19 @@ Ran 1 test in 0.092s
 
 OK
 ```
+Now, edit the test in `tests/my_example/test_my_example.py` to implement the actual unittest.
+
+## all at once
+To record and generated the unittest in a single command, use:
+
+```python
+import boto3
+from botocore_stubber_recorder import BotoRecorderUnitTestGenerator
+
+session = boto3.session.Session()
+with BotoRecorderUnitTestGenerator("my_example", session) as generator:
+    ## do your thing with the session
+```
+
+## generated code format
+The generated code is formatted using black, if [black](https://black.readthedocs.io/) is on the path.

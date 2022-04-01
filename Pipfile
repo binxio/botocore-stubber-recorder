@@ -8,6 +8,7 @@ botocore-stubber-recorder = {editable = true, path = "."}
 
 [dev-packages]
 twine = "*"
+git-release-tag = "*"
 
 [requires]
 python_version = "3.9"

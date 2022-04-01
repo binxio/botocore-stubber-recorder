@@ -7,8 +7,8 @@ responses for all recorded requests.
 import unittest
 import botocore.session
 from botocore.stub import Stubber
-{% for request in recorder.requests %}
-from {{ generator.package }}{{ generator.name }} import call_{{ "%05d"|format(loop.index) }}_{{ request.operation }}
+{% for call in recorder.calls %}
+from {{ generator.package }}{{ generator.name }} import call_{{ "%05d"|format(loop.index) }}_{{ call.operation }}
 {% endfor %}
 
 class {{ generator.name_in_camel_case }}UnitTestBase(unittest.TestCase):
@@ -21,8 +21,8 @@ class {{ generator.name_in_camel_case }}UnitTestBase(unittest.TestCase):
         self.clients = {service: self.session.create_client(service) for service in [{%- for service in recorder.invoked_service_names -%}"{{  service  }}"{{  ", " if not loop.last else "" }}{%- endfor -%}]}
         self.stubs = {service: Stubber(client) for service, client in self.clients.items()}
 
-        {% for request in recorder.requests %}
-        self.stubs["{{request.service_name}}"].add_response("{{ request.operation }}", call_{{ "%05d"|format(loop.index) }}_{{ request.operation }}.response, call_{{ "%05d"|format(loop.index) }}_{{ request.operation }}.request)
+        {% for call in recorder.calls %}
+        self.stubs["{{call.service_name}}"].add_response("{{ call.operation }}", call_{{ "%05d"|format(loop.index) }}_{{ call.operation }}.response, call_{{ "%05d"|format(loop.index) }}_{{ call.operation }}.request)
         {% endfor %}
         for _, stub in self.stubs.items():
             stub.activate()

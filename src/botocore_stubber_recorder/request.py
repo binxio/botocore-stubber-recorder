@@ -9,7 +9,10 @@ import botocore
 from botocore.model import OperationModel
 
 
-class BotoRequest:
+class APICall:
+    """
+    represents an AWS API call.
+    """
     def __init__(self, model: OperationModel, request: Union[dict, bytes]):
         self.uuid: str = str(uuid4())
         self._response: dict = {}
@@ -19,10 +22,17 @@ class BotoRequest:
 
     @property
     def request(self) -> dict:
+        """
+        the request of the call
+        """
         return self._request
 
     @request.setter
     def request(self, request: Union[dict, bytes]):
+        """
+        Sets the `request`. if the request is a byte array, it is assumed to be a JSON
+        representation of a dictionary.
+        """
         if isinstance(request, dict):
             self._request = deepcopy(request if request else {})
         else:
@@ -40,10 +50,16 @@ class BotoRequest:
 
     @property
     def response(self) -> dict:
+        """
+        response associated to the request
+        """
         return self._response
 
     @response.setter
     def response(self, response: dict):
+        """
+        sets the response for this `request`
+        """
         self._response = deepcopy(response) if response else {}
 
     @property
@@ -65,8 +81,8 @@ class BotoRequest:
     ):
         """
         returns python code for the function adding the `request` and `response` for the `operation`
-        add_response to a passedin in stub.
-        :return:
+        add_response to a passedin in stub. If anonimize is set to true, the AWS account number
+        is replaced by a generic account number.
         """
         operation = botocore.xform_name(self.model.name)
         stream.truncate(0)

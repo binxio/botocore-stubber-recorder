@@ -6,7 +6,7 @@ import botocore
 from typing import Optional
 from jinja2 import Template, Environment, PackageLoader, select_autoescape
 from botocore_stubber_recorder.recorder import BotoRecorder
-from botocore_stubber_recorder.request import BotoRequest
+from botocore_stubber_recorder.request import APICall
 
 env = Environment(
     loader=PackageLoader("botocore_stubber_recorder"), autoescape=select_autoescape()
@@ -14,6 +14,11 @@ env = Environment(
 
 
 class UnitTestGenerator:
+    """
+    generates a Python unittest for a sequence of recorded AWS API calls.
+    `name` is the name of the test, must be snake case. `package` is the
+    python package name for the generated code. the code is generated in `directory`.
+    """
     def __init__(self, name: str, directory: str, package: str = None):
         if not re.match(r"[a-z_]+", name):
             raise ValueError(f'only snake case allowed for the name, not "{name}"')
@@ -28,33 +33,55 @@ class UnitTestGenerator:
 
     @property
     def unittest_base_template(self) -> Template:
+        """
+        the jinja2 template for the base unittest which sets up the stubber.
+        """
         return env.get_template("unittest_base.j2")
 
     @property
     def unittest_template(self) -> Template:
+        """
+        the jinja2 template for generating the initial unittest.
+        """
         return env.get_template("unittest.j2")
 
     @property
     def name_in_camel_case(self):
+        """
+        returns the name of the unittest in camel case.
+        """
         return "".join(w.capitalize() or "_" for w in self.name.split("_"))
 
-    def _remove(self, path: str, type: Optional[str] = None):
-        logging.info("removing generated %s %s", type, path)
-        os.remove(path) if type == "file" else os.rmdir(path)
+    def _remove(self, path: str):
+        """
+        removes the file or directory pointed to by `path`
+        """
+        if os.path.isdir(path):
+            logging.info("removing generated directory %s", path)
+            os.rmdir(path)
+        else:
+            logging.info("removing generated file %s", path)
+            os.remove(path)
 
     def remove_all_call_directories(self, root: str):
+        """
+        removes all directories and files representing a AWS API call.
+        """
         for call_directory in map(lambda e: os.path.join(root, e), os.listdir(root)):
             if re.match(r"^call_[0-9]{5,}_", os.path.basename(call_directory)):
                 for (child, directories, files) in os.walk(
                     call_directory, topdown=False
                 ):
                     for file in files:
-                        self._remove(os.path.join(child, file), "file")
+                        self._remove(os.path.join(child, file))
                     for directory in directories:
                         self._remove(os.path.join(child, directory))
                 self._remove(call_directory)
 
     def generate(self, recorder: BotoRecorder, anonimize: bool = False):
+        """
+        generates a unittest based on the calls in the recorder.
+        """
         test_directory = os.path.join(self.directory, self.name)
         os.makedirs(test_directory, exist_ok=True)
 
@@ -79,7 +106,7 @@ class UnitTestGenerator:
             logging.info("%s already exists, not overwritten", filename)
 
         self.remove_all_call_directories(test_directory)
-        for n, request in enumerate(recorder.requests):
+        for n, request in enumerate(recorder.calls):
             operation = botocore.xform_name(request.model.name)
             directory = os.path.join(test_directory, f"call_{n+1:05d}_{operation}")
             filename = os.path.join(directory, "__init__.py")
@@ -115,8 +142,14 @@ class BotoRecorderUnitTestGenerator:
         self.anonimize = anonimize
 
     def __enter__(self):
+        """
+        start the recorder
+        """
         self.recorder = BotoRecorder(self.session)
         return self
 
     def __exit__(self, type, value, tb):
+        """
+        generate the unittest.
+        """
         self.generator.generate(self.recorder, self.anonimize)

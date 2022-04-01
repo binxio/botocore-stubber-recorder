@@ -1,12 +1,15 @@
 import botocore
 import re, os
 from typing import Dict
-from botocore_stubber_recorder.request import BotoRequest
+from botocore_stubber_recorder.request import APICall
 
 
 class BotoRecorder:
+    """
+    records all AWS API calls
+    """
     def __init__(self, session: botocore.session.Session):
-        self.requests: [BotoRequest] = []
+        self.calls: [APICall] = []
         self.session = session
         self.session.events.register(
             event_name="before-call.*", handler=self.before_call_handler
@@ -18,18 +21,24 @@ class BotoRecorder:
     @property
     def invoked_service_names(self) -> set:
         """
-        returns the set of AWS service names invoked in the recording
+        returns the set of AWS service names invoked in the calls
         """
-        return set(map(lambda r: r.service_name, self.requests))
+        return set(map(lambda r: r.service_name, self.calls))
 
     def before_call_handler(self, *args, **kwargs):
+        """
+        add a call for this request.
+        """
         model = kwargs["model"]
         body = kwargs["params"].get("body")
-        self.requests.append(BotoRequest(model, body))
+        self.calls.append(APICall(model, body))
 
     def after_call_handler(self, *args, **kwargs):
-        request = self.requests[-1] if self.requests else None
-        if not request or request.model != kwargs["model"]:
+        """
+        adds the response to the last recorded call.
+        """
+        call = self.calls[-1] if self.calls else None
+        if not call or call.model != kwargs["model"]:
             logging.warn("received a response no matching a request")
             return
-        request.response = kwargs["parsed"]
+        call.response = kwargs["parsed"]

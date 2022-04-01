@@ -1,5 +1,5 @@
 """
-Generated base class for the report unit test. The setup will provide stubbed
+Generated base class for the my_example unit test. The setup will provide stubbed
 responses for all recorded requests.
 
 ** generated code - do not edit **
@@ -8,14 +8,14 @@ import unittest
 import botocore.session
 from botocore.stub import Stubber
 
-from report import call_00001_describe_regions
+from my_example import call_00001_describe_regions
 
-from report import call_00002_describe_parameters
+from my_example import call_00002_describe_parameters
 
-from report import call_00003_describe_db_clusters
+from my_example import call_00003_describe_db_clusters
 
 
-class ReportUnitTestBase(unittest.TestCase):
+class MyExampleUnitTestBase(unittest.TestCase):
     def setUp(self) -> None:
         """
         add stubs for all AWS API calls
@@ -23,7 +23,7 @@ class ReportUnitTestBase(unittest.TestCase):
         self.session = botocore.session.get_session()
         self.clients = {
             service: self.session.create_client(service)
-            for service in ["rds", "ssm", "ec2"]
+            for service in ["ssm", "ec2", "rds"]
         }
         self.stubs = {
             service: Stubber(client) for service, client in self.clients.items()

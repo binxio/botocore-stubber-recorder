@@ -56,7 +56,7 @@ have to replace the method `test_my_example` with a functional test.
 You can now run, the generated test:
 ```shell
 cd tests
-python -munittest tests/my_example/test_my_example.py
+python -munittest ./my_example/test_my_example.py
 ```
 ```
 WARNING:root:TODO: replace MyExampleUnitTest.test_my_example with the actual test. This just tests the generated code.
@@ -73,9 +73,12 @@ To record and generated the unittest in a single command, use:
 
 ```python
 import boto3
+import botocore
 from botocore_stubber_recorder import BotoRecorderUnitTestGenerator
 
-session = boto3.session.Session()
+session = botocore.session.get_session()
+boto3.setup_default_session(botocore_session=session)
+
 with BotoRecorderUnitTestGenerator("my_example", session) as generator:
     ## do your thing with the session
 ```

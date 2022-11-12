@@ -27,7 +27,9 @@ clean:
 	find . -name \*.pyc | xargs rm 
 
 test: Pipfile.lock
-	[ -z "$(shell ls -1 tests/test*.py 2>/dev/null)" ] || PYTHONPATH=$(PWD)/src pipenv run pytest ./tests/test*.py
+	rm -rf generated tests/generated && pipenv run python setup.py test
+	@echo test generated unit tests
+	unset AWS_PROFILE ; PYTHONPATH=$PWD pipenv run pytest generated
 
 fmt:
 	black $(shell find src -name \*.py) tests/*.py

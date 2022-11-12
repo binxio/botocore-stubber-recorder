@@ -3,6 +3,7 @@
 This file is generated once, but never overwritten.
 Implement the actual test in test_{{ generator.name }}
 """
+import boto3
 import logging
 import unittest
 from {{ generator.package }}{{ generator.name }}.base import {{ generator.name_in_camel_case }}UnitTestBase
@@ -26,9 +27,11 @@ class {{ generator.name_in_camel_case }}UnitTest({{ generator.name_in_camel_case
         {% endfor %}
     def setUp(self):
         super().setUp()
+        boto3.setup_default_session(botocore_session=self.session)
 
     def tearDown(self):
         super().tearDown()
+        boto3.DEFAULT_SESSION = None
 
 
 if __name__ == '__main__':

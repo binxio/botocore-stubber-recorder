@@ -37,7 +37,6 @@ class MyTestCase(unittest.TestCase):
         generator.generate(recorder)
 
     def test_record_multiple_calls(self):
-
         session = boto3.session.Session(profile_name="integration-test")
         recorder = BotoRecorder(session)
 
@@ -65,6 +64,26 @@ class MyTestCase(unittest.TestCase):
         ) as generator:
             client = session.client("rds")
             client.describe_db_instances()
+
+    def test_record_unflattened_api(self):
+        session = boto3.session.Session(profile_name="integration-test")
+        recorder = BotoRecorder(session)
+
+        client = session.client("ec2")
+        response = client.describe_images(
+            Filters=[
+                {"Name": "name", "Values": ["Windows_Server-2016-English-Full-Base-*"]},
+                {"Name": "state", "Values": ["available"]},
+                {"Name": "virtualization-type", "Values": ["hvm"]},
+                {"Name": "root-device-type", "Values": ["ebs"]},
+            ]
+        )
+        self.assertEqual(1, len(recorder.calls))
+
+        self.assertSetEqual({"ec2"}, recorder.invoked_service_names)
+
+        generator = UnitTestGenerator("unflattened_api", "generated", "generated")
+        generator.generate(recorder, unflatten=True)
 
 
 if __name__ == "__main__":

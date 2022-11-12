@@ -1,4 +1,4 @@
-import botocore
+from botocore.session import Session
 import re, os
 from typing import Dict
 from botocore_stubber_recorder.request import APICall
@@ -9,7 +9,7 @@ class BotoRecorder:
     records all AWS API calls
     """
 
-    def __init__(self, session: botocore.session.Session):
+    def __init__(self, session: Session):
         self.calls: [APICall] = []
         self.session = session
         self.session.events.register(

@@ -80,9 +80,14 @@ class UnitTestGenerator:
                         self._remove(os.path.join(child, directory))
                 self._remove(call_directory)
 
-    def generate(self, recorder: BotoRecorder, anonimize: bool = False):
+    def generate(
+        self, recorder: BotoRecorder, anonimize: bool = False, unflatten: bool = False
+    ):
         """
         generates a unittest based on the calls in the recorder.
+        if anonimize is set to True, the account id in the arn's will be removed.
+        if unflatten is set to True, requests which were flattened by botocore are attempted
+        to be unflattened. See unflatten.unflattener for details.
         """
         test_directory = os.path.join(self.directory, self.name)
         os.makedirs(test_directory, exist_ok=True)
@@ -118,7 +123,7 @@ class UnitTestGenerator:
             with os.fdopen(
                 os.open(filename, os.O_WRONLY | os.O_CREAT, 0o600), "w"
             ) as file:
-                request.generate_add_response_function(file, anonimize)
+                request.generate_add_response_function(file, anonimize, unflatten)
 
         if is_black_on_path():
             format_source_code(test_directory)
@@ -131,7 +136,7 @@ class BotoRecorderUnitTestGenerator:
     with BotoRecorderUnitTestGenerator("describe_regions", session) as generator:
         response = session.client("ec2").describe_regions()
 
-    this will generate
+    this will generate the unit tests with the stubs for the call.
     """
 
     def __init__(
@@ -141,11 +146,13 @@ class BotoRecorderUnitTestGenerator:
         directory: str = "./tests",
         package: str = "",
         anonimize=True,
+        unflatten=False,
     ):
         self.session = session
         self.generator = UnitTestGenerator(name, directory, package)
         self.recorder: BotoRecorder = None
         self.anonimize = anonimize
+        self.unflatten = unflatten
 
     def __enter__(self):
         """
@@ -158,4 +165,4 @@ class BotoRecorderUnitTestGenerator:
         """
         generate the unittest.
         """
-        self.generator.generate(self.recorder, self.anonimize)
+        self.generator.generate(self.recorder, self.anonimize, self.unflatten)

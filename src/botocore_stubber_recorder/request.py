@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import botocore
 from botocore.model import OperationModel
+from botocore_stubber_recorder.unflatten import unflattener
 
 
 class APICall:
@@ -42,9 +43,28 @@ class APICall:
     @property
     def cleaned_request(self):
         """
-        returns the request without the added Version and Action items.
+        returns the request without the added Version and Action items. If
+        it is a flattened request, it will be unflattened.
         """
         result = deepcopy(self._request)
+        result.pop("Version", None)
+        result.pop("Action", None)
+
+        return result
+
+    @property
+    def is_flattened(self):
+        """
+        returns true if the keys contains a . suggesting a flattened request parameter
+        """
+        return any(filter(lambda k: "." in k, self._request.keys()))
+
+    @property
+    def unflattened(self):
+        """
+        returns and unflattened, cleaned request.
+        """
+        result = unflattener(self._request)
         result.pop("Version", None)
         result.pop("Action", None)
         return result
@@ -78,19 +98,26 @@ class APICall:
         return self.model.service_model.service_name
 
     def generate_add_response_function(
-        self, stream: TextIOBase, anonimize: bool = False
+        self, stream: TextIOBase, anonimize: bool = False, unflatten: bool = False
     ):
         """
         returns python code for the function adding the `request` and `response` for the `operation`
         add_response to a passedin in stub. If anonimize is set to true, the AWS account number
         is replaced by a generic account number.
+        If unflatten is set to true, we will try to unflatten the botocore request that was
+        received by the event handler.
         """
         operation = botocore.xform_name(self.model.name)
         stream.truncate(0)
+        original_request = (
+            self.unflattened
+            if unflatten and self.is_flattened
+            else self.cleaned_request
+        )
         request = (
-            anonimize_aws_account(str(self.cleaned_request))
+            anonimize_aws_account(str(original_request))
             if anonimize
-            else str(self.cleaned_request)
+            else str(original_request)
         )
         response = (
             anonimize_aws_account(str(self.response))

@@ -29,7 +29,7 @@ To generate a unittest, add the following snippet:
 from botocore_stubber_recorder import UnitTestGenerator
 
 generator = UnitTestGenerator(name="my_example",directory="./tests")
-generator.generate(recorder, anonimize=True)
+generator.generate(recorder, anonimize=True, unflatten=True)
 ```
 
 This will generate the following file structure:

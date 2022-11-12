@@ -16,7 +16,7 @@ do-build: Pipfile.lock
 	pipenv run python setup.py build
 	pipenv run python setup.py sdist
 
-upload-dist: Pipfile.lock
+deploy: Pipfile.lock
 	pipenv run twine upload dist/*
 
 Pipfile.lock: Pipfile setup.py

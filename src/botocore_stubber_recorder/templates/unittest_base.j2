@@ -53,6 +53,7 @@ class {{ generator.name_in_camel_case }}UnitTestBase(unittest.TestCase):
             stub.activate()
 
     def tearDown(self) -> None:
+        boto3.DEFAULT_SESSION = None
         if self.record:
             self.write_stubs()
         else:

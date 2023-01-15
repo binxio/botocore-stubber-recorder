@@ -26,7 +26,7 @@ class MyExampleUnitTestBase(unittest.TestCase):
             "profile_name": "integration-test",
             "region_name": "eu-west-1",
         }
-        self.record = True
+        self.record = False
         self.anonimize = False
         self.unflatten = False
 
@@ -76,6 +76,7 @@ class MyExampleUnitTestBase(unittest.TestCase):
             stub.activate()
 
     def tearDown(self) -> None:
+        boto3.DEFAULT_SESSION = None
         if self.record:
             self.write_stubs()
         else:

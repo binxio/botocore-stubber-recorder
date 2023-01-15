@@ -4,6 +4,7 @@ responses for all recorded requests.
 
 ** generated code - do not edit **
 """
+import os
 import unittest
 import boto3
 import botocore.session
@@ -26,7 +27,7 @@ class MyExampleUnitTestBase(unittest.TestCase):
             "profile_name": "integration-test",
             "region_name": "eu-west-1",
         }
-        self.record = False
+        self.record = os.getenv("RECORD_UNITTEST_STUBS", "false").lower() == "true"
         self.anonimize = False
         self.unflatten = False
 
@@ -48,7 +49,7 @@ class MyExampleUnitTestBase(unittest.TestCase):
 
         self.clients = {
             service: self.botocore_session.create_client(service)
-            for service in ["ec2", "rds", "ssm"]
+            for service in ["ssm", "rds", "ec2"]
         }
         self.stubs = {
             service: Stubber(client) for service, client in self.clients.items()
@@ -98,6 +99,6 @@ class MyExampleUnitTestBase(unittest.TestCase):
 
     def write_stubs(self):
         test_name = "my_example"
-        directory = "./tests"
+        directory = Path(__file__).parent.parent
         generator = UnitTestGenerator(test_name, directory, "")
-        generator.generate(self.recorder, False, True)
+        generator.generate(self.recorder, self.anonimize, self.unflatten)

@@ -11,6 +11,10 @@ from {{ generator.package }}{{ generator.name }}.base import {{ generator.name_i
 
 class {{ generator.name_in_camel_case }}UnitTest({{ generator.name_in_camel_case }}UnitTestBase):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.record = False
+
     def test_{{ generator.name }}(self) -> None:
         """
         test {{generator.name }}. Stubbed clients will be returned for:{%
@@ -27,11 +31,9 @@ class {{ generator.name_in_camel_case }}UnitTest({{ generator.name_in_camel_case
         {% endfor %}
     def setUp(self):
         super().setUp()
-        boto3.setup_default_session(botocore_session=self.session)
 
     def tearDown(self):
         super().tearDown()
-        boto3.DEFAULT_SESSION = None
 
 
 if __name__ == '__main__':

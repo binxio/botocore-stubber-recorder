@@ -73,11 +73,9 @@ To record and generated the unittest in a single command, use:
 
 ```python
 import boto3
-import botocore
 from botocore_stubber_recorder import BotoRecorderUnitTestGenerator
 
-session = botocore.session.get_session()
-boto3.setup_default_session(botocore_session=session)
+session = boto3.session.Session()
 
 with BotoRecorderUnitTestGenerator("my_example", session) as generator:
     ## do your thing with the session

@@ -7,13 +7,13 @@ request = {}
 response = {
     "Regions": [
         {
-            "Endpoint": "ec2.eu-north-1.amazonaws.com",
-            "RegionName": "eu-north-1",
+            "Endpoint": "ec2.ap-south-1.amazonaws.com",
+            "RegionName": "ap-south-1",
             "OptInStatus": "opt-in-not-required",
         },
         {
-            "Endpoint": "ec2.ap-south-1.amazonaws.com",
-            "RegionName": "ap-south-1",
+            "Endpoint": "ec2.eu-north-1.amazonaws.com",
+            "RegionName": "eu-north-1",
             "OptInStatus": "opt-in-not-required",
         },
         {
@@ -47,13 +47,13 @@ response = {
             "OptInStatus": "opt-in-not-required",
         },
         {
-            "Endpoint": "ec2.sa-east-1.amazonaws.com",
-            "RegionName": "sa-east-1",
+            "Endpoint": "ec2.ca-central-1.amazonaws.com",
+            "RegionName": "ca-central-1",
             "OptInStatus": "opt-in-not-required",
         },
         {
-            "Endpoint": "ec2.ca-central-1.amazonaws.com",
-            "RegionName": "ca-central-1",
+            "Endpoint": "ec2.sa-east-1.amazonaws.com",
+            "RegionName": "sa-east-1",
             "OptInStatus": "opt-in-not-required",
         },
         {
@@ -93,16 +93,16 @@ response = {
         },
     ],
     "ResponseMetadata": {
-        "RequestId": "c6011812-57d2-4db8-bcc4-40c787dc13e9",
+        "RequestId": "b86ad32a-801d-4c9b-a8bc-813abcc14342",
         "HTTPStatusCode": 200,
         "HTTPHeaders": {
-            "x-amzn-requestid": "c6011812-57d2-4db8-bcc4-40c787dc13e9",
+            "x-amzn-requestid": "b86ad32a-801d-4c9b-a8bc-813abcc14342",
             "cache-control": "no-cache, no-store",
             "strict-transport-security": "max-age=31536000; includeSubDomains",
             "vary": "accept-encoding",
             "content-type": "text/xml;charset=UTF-8",
             "content-length": "3875",
-            "date": "Fri, 01 Apr 2022 07:53:05 GMT",
+            "date": "Sun, 15 Jan 2023 13:00:12 GMT",
             "server": "AmazonEC2",
         },
         "RetryAttempts": 0,

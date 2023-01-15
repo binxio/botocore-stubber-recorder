@@ -3,18 +3,23 @@ my_example unit test.
 This file is generated once, but never overwritten.
 Implement the actual test in test_my_example
 """
+import boto3
 import logging
 import unittest
 from my_example.base import MyExampleUnitTestBase
 
 
 class MyExampleUnitTest(MyExampleUnitTestBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.record = False
+
     def test_my_example(self) -> None:
         """
         test my_example. Stubbed clients will be returned for:
-            - self.session.client("ec2")
+            - self.session.client("rds")
             - self.session.client("ssm")
-            - self.session.client("rds").
+            - self.session.client("ec2").
         """
         logging.warning(
             "TODO: replace MyExampleUnitTest.test_my_example with the actual test. This just tests the generated code."

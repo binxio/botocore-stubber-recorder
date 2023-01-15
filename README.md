@@ -68,6 +68,15 @@ OK
 ```
 Now, edit the test in `tests/my_example/test_my_example.py` to implement the actual unittest.
 
+## recording the responses
+If you want to re-record the AWS API stubs, set the environment variable RECORD_UNITTEST_STUBS to `true`.
+
+```
+RECORD_UNITTEST_STUBS=true python -munittest ./my_example/test_my_example.py
+```
+This will allow you to change the implementation of the unit test, and easily record
+the calls.
+
 ## all at once
 To record and generated the unittest in a single command, use:
 

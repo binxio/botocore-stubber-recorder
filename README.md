@@ -8,6 +8,30 @@ act as an endpoint, returning the appropriate response to each request in order.
 However, using the stubs in your unittest is quite laborious. You have to record the requests and
 responses, configure the stub and run the test. This library makes it pretty simple. 
 
+## getting started
+To start, type:
+
+```
+$ botocore-stubber-recorder --test-name show_me_how
+NFO:root:sketelon test sts_get_caller written in tests/xyz
+```
+
+This generates the following files:
+```
+tests/xyz
+├── __init__.py
+└── sts_get_caller
+    ├── __init__.py
+    ├── base.py
+    ├── call_00001_get_caller_identity
+    │   └── __init__.py
+    └── test_sts_get_caller.py
+```
+You can now start writing your unit test in `test_sts_get_caller.py`. By running
+the unit test with `self.record = True` or the environment variable
+`RECORD_UNITTEST_STUBS=true` it will re-record the stubs for you.
+
+
 ## how to record all AWS API calls?
 To record all AWS API calls is really simple. Just add the following snippet:
 

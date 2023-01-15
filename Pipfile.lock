@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ab1d6e419caeb591c80f95696aec1a4b78c81f447e7aba5577f5b2b82a204809"
+            "sha256": "61b915ec855a61de7273c41cfcaa47e8ee90ba5f18866f2a36af25ae98d699c9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -51,8 +51,8 @@
             "version": "==1.29.50"
         },
         "botocore-stubber-recorder": {
-            "editable": true,
-            "path": "."
+            "path": ".",
+            "version": "==0.5.1"
         },
         "botostubs": {
             "hashes": [

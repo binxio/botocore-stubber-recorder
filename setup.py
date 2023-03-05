@@ -19,7 +19,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="botocore-stubber-recorder",
-    version="0.6.0",
+    version="0.6.1",
     url="https://github.com/binxio/botocore-stubber-recorder",
     license="BSD",
     author="Mark van Holsteijn",

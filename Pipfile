@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-botocore-stubber-recorder = {path = "."}
+botocore-stubber-recorder = {editable = true, path = "."}
 
 [dev-packages]
 twine = "*"

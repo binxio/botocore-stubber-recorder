@@ -94,7 +94,7 @@ class UnitTestGenerator:
         test_directory = os.path.join(self.directory, self.name)
         os.makedirs(test_directory, exist_ok=True)
 
-        for directory in [self.directory, test_directory]:
+        for directory in [self.directory, test_directory] if self.package else [test_directory]:
             filename = os.path.join(directory, "__init__.py")
             if not os.path.exists(filename):
                 with open(filename, "w") as file:

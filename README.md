@@ -13,20 +13,22 @@ To start, type:
 
 ```
 $ botocore-stubber-recorder --test-name show_me_how
-NFO:root:sketelon test sts_get_caller written in tests/xyz
+INFO:root:sketelon test sts_get_caller written in ./tests
 ```
 
 This generates the following files:
 ```
-tests/xyz
+$ tree tests 
+tests
 ├── __init__.py
-└── sts_get_caller
+└── show_me_how
     ├── __init__.py
     ├── base.py
     ├── call_00001_get_caller_identity
     │   └── __init__.py
-    └── test_sts_get_caller.py
+    └── test_show_me_how.py
 ```
+
 You can now start writing your unit test in `test_sts_get_caller.py`. By running
 the unit test with `self.record = True` or the environment variable
 `RECORD_UNITTEST_STUBS=true` it will re-record the stubs for you.
